@@ -4,6 +4,7 @@ import express from 'express';
 
 
 
+
 const writeFile = (path, products) => fs.promises.writeFile(path, JSON.stringify({products}));
 
 const readFile = async(path) => {
@@ -46,10 +47,10 @@ export default class ProductManager{
 
     addProduct = async ({title, description, price, thumbnail, code, stock}) => {
 
-        const findedProduct = this.products.find((product) => product.title === title || product.code === code)
+        const findedProduct = this.products.find((product) => product.title === title)
         
         if(findedProduct){
-            console.log(`Error, ya existe un producto con ese titulo o codigo: ${title} - ${code}`)
+            console.log(`Error, ya existe un producto con ese titulo: ${title}`)
 
         }else{
 
@@ -69,6 +70,16 @@ export default class ProductManager{
             console.log('Producto encontrado \n'+ JSON.stringify(findedProduct))
         }else{
             console.log('No existe ningun producto con ese Id')
+        };
+    };
+
+    getProductsByCode(code){
+        const findedProduct = this.products.find((product) => product.code === code)
+
+        if(findedProduct){
+            console.log('Producto encontrado \n'+ JSON.stringify(findedProduct))
+        }else{
+            console.log('No existe ningun producto con ese Code')
         };
     };
 
@@ -120,7 +131,7 @@ async function main () {
         description: "Camisa a cuadros, corte italiano",
         price: 500,
         thumbnail: "small picture of the product",
-        code: "B305",
+        code: "a",
         stock: 35,
         type:"module"
     }
@@ -130,7 +141,7 @@ async function main () {
         description: "Pantalon jogger camuflado",
         price: 750,
         thumbnail:"small picture of the product",
-       code: "C100",
+       code: "b",
         stock: 15
     }
 
@@ -142,100 +153,152 @@ async function main () {
         description: "Buzo polar con capucha",
         price: 1100,
         thumbnail: "small picture of the product",
-        code: "F30",
+        code: "a",
         stock: 33,
         type:"module"
 
     }
+
+    const newProduct4 = {
+        title: "Pantalon Chino",
+        description: "Pantalon estilo chino de gabardina beige",
+        price: 2100,
+        thumbnail: "small picture of the product",
+        code: "b",
+        stock: 30,
+        type:"module"
+
+    }
+    const newProduct5 = {
+        title: "Buzo Belgrano suplente",
+        description: "Buzo equipacion suplente Belgrano",
+        price: 1500,
+        thumbnail: "small picture of the product",
+        code: "a",
+        stock: 23,
+        type:"module"
+
+    }
+    const newProduct6 = {
+        title: "Remera Maestro Yoda",
+        description: "Remera mangas cortas Maestro Yoda",
+        price: 1000,
+        thumbnail: "small picture of the product",
+        code: "b",
+        stock: 15,
+        type:"module"
+
+    }
+    const newProduct7 = {
+        title: "Campera rompeviento",
+        description: "Campera rompeviento fucsia",
+        price: 2000,
+        thumbnail: "small picture of the product",
+        code: "a",
+        stock: 10,
+        type:"module"
+
+    }
+    const newProduct8 = {
+        title: "Zapatillas botitas",
+        description: "Zapatillas estilo converse azules",
+        price: 1800,
+        thumbnail: "small picture of the product",
+        code: "b",
+        stock: 7,
+        type:"module"
+
+    }
+    const newProduct9 = {
+        title: "Pack Medias",
+        description: "Pack de 5 pares de medias blancas largas",
+        price: 800,
+        thumbnail: "small picture of the product",
+        code: "a",
+        stock: 10,
+        type:"module"
+
+    }
+    const newProduct10 = {
+        title: "Piluso",
+        description: "Piluso negro",
+        price: 1000,
+        thumbnail: "small picture of the product",
+        code: "b",
+        stock: 5,
+        type:"module"
+
+    }
+
     
     await productManager.addProduct(newProduct)
     await productManager.addProduct(newProduct2)
     await productManager.addProduct(newProduct3)
+    await productManager.addProduct(newProduct4)
+    await productManager.addProduct(newProduct5)
+    await productManager.addProduct(newProduct6)
+    await productManager.addProduct(newProduct7)
+    await productManager.addProduct(newProduct8)
+    await productManager.addProduct(newProduct9)
+    await productManager.addProduct(newProduct10)
 
-}
-
-    main();
 
 
-
-    
-/*
     products = await productManager.getProducts();
     //console.log(products)
+
+    app.use(express.urlencoded({ extended: true}))
   
     app.get('/products', (req, res) =>{
-        res.send(products)
+
+            let limit = req.query.limit;
+            
+            if (!limit) {
+                return res.send({ products });
+            }
+
+
+            let limitedProducts = products.slice(0, limit);
+
+            // Enviar los productos limitados al cliente
+            res.send({ products: limitedProducts });
+        
     })
 
-    app.get('/products/:id', (req, res) =>{
-        products.id = req.params
-        res.send(products[products.id])
+    app.get('/:productoId', (req, res) =>{
+        const productId = req.params.productoId
+        const product = products.find(p => p.id === productId)
+        
+        if (!product){
+            return res.status(404).send('Usuario no encontrado')
+        }
+        res.send(product)
     })
 
-    app.listen(3000, () => {
+
+
+
+
+
+
+    app.listen(8080, () => {
         console.log('running from express')
     })
+
+
+
+    
+
+    
     
     
 }
 
 
 
+main();
 
 
 
 
 
-
-
-
-
-
-
-productos
-[   
-    {
-        "title": "Camisa a cuadros",
-        "description": "Camisa a cuadros, corte italiano",
-        "price": 500,
-        "thumbnail": "small picture of the product",
-        "code": "B305",
-        "stock": 35,
-        "type":"module"
-
-    },
-    {
-        "title": "Jogger camuflado",
-        "description": "Pantalon jogger camuflado",
-        "price": 750,
-        "thumbnail":"small picture of the product",
-        "code": "C100",
-        "stock": 15
-        
-
-    },
-    {
-        "title": "Medias invisibles",
-        "description": "Medias, tipo soquetes invisibles",
-        "price": 150,
-        "thumbnail":"small picture of the product",
-        "code": "A200",
-        "stock": 15
-        
-
-    }
-]
-
-
-
-productManager.addProduct(newProduct1);
-productManager.addProduct(newProduct2);
-
-console.log(productManager.deleteProduct(6))
-console.log(productManager.deleteProduct(2))
-console.log(productManager.getProductsById(1));
-console.log(productManager.getProductsById(2));
-
-
-
-*/
