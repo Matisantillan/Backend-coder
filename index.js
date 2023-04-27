@@ -5,6 +5,7 @@ import express from 'express';
 
 
 
+
 const writeFile = (path, products) => fs.promises.writeFile(path, JSON.stringify({products}));
 
 const readFile = async(path) => {
@@ -16,7 +17,12 @@ const readFile = async(path) => {
 
 
 
+
+
 export default class ProductManager{
+
+    
+
     constructor(path){
         
         this.products = [];
@@ -115,14 +121,101 @@ export default class ProductManager{
     }
 
 
+    
+
+
 };
 
+
+
+
 async function main () {
+    
     const app = express()
     const productManager = new ProductManager('./productos.json');
 
     await productManager.initialize();
 
+    app.use(express.json())
+    app.use(express.urlencoded({ extended: true}))
+
+    
+  
+    app.get('/products', async (req, res) => {
+        const jsonData = await readFile('./productos.json');
+        let products = jsonData.products;
+      
+        // Obtener el valor del parámetro `limit` de la URL
+        const limit = parseInt(req.query.limit);
+      
+        // Si se especificó un límite, se filtran solo los primeros N productos
+        if (limit && limit > 0) {
+          products = products.slice(0, limit);
+        }
+      
+        res.send({ products });
+      });
+
+    
+
+      app.get('/products/:id', async (req, res) => {
+        const id = Number.parseInt(req.params.id);
+        const jsonData = await readFile('./productos.json');
+        const products = jsonData.products;
+        const product = products.find((product) => product.id === id);
+        
+        if (product) {
+          res.send({ product });
+        } else {
+          res.status(404).send({ error: 'Product not found' });
+        }
+      });
+      
+
+
+    app.listen(8080, () => {
+        console.log('running from express')
+    })
+
+
+
+    
+
+    
+    
+    
+}
+
+
+
+main();
+
+
+
+
+
+/*
+app.get('/products', (req, res) =>{
+
+            let limit = req.query.limit;
+            
+            if (!limit) {
+                return res.send({ products });
+            }
+
+
+            let limitedProducts = products.slice(0, limit);
+            console.log({products: limitedProducts})
+
+
+            // Enviar los productos limitados al cliente
+            res.send({ products: limitedProducts });
+        
+    })
+    */
+
+
+    /*
     let products = await productManager.getProducts();
     //console.log(products);
 
@@ -241,64 +334,12 @@ async function main () {
     await productManager.addProduct(newProduct8)
     await productManager.addProduct(newProduct9)
     await productManager.addProduct(newProduct10)
+   
 
-
+    
 
     products = await productManager.getProducts();
     //console.log(products)
 
-    app.use(express.urlencoded({ extended: true}))
-  
-    app.get('/products', (req, res) =>{
-
-            let limit = req.query.limit;
-            
-            if (!limit) {
-                return res.send({ products });
-            }
-
-
-            let limitedProducts = products.slice(0, limit);
-
-            // Enviar los productos limitados al cliente
-            res.send({ products: limitedProducts });
-        
-    })
-
-    app.get('/:productoId', (req, res) =>{
-        const productId = req.params.productoId
-        const product = products.find(p => p.id === productId)
-        
-        if (!product){
-            return res.status(404).send('Usuario no encontrado')
-        }
-        res.send(product)
-    })
-
-
-
-
-
-
-
-    app.listen(8080, () => {
-        console.log('running from express')
-    })
-
-
-
-    
-
-    
-    
-    
-}
-
-
-
-main();
-
-
-
-
-
+    */
+   
